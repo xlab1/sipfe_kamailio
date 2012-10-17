@@ -17,7 +17,7 @@
 #
 # If you want to setup a database with kamdbctl, you must at least specify
 # this parameter.
-# DBENGINE=MYSQL
+DBENGINE=DBTEXT
 
 ## database host
 # DBHOST=localhost
@@ -26,7 +26,8 @@
 # DBNAME=openser
 
 # database path used by dbtext, db_berkeley or sqlite
-# DB_PATH="/usr/local/etc/kamailio/dbtext"
+DB_PATH="/opt/sipfe/etc/kamailio_db"
+DBTEXT_PATH="/opt/sipfe/etc/kamailio_db"
 
 ## database read/write user
 # DBRWUSER=openser
@@ -91,10 +92,10 @@
 #
 
 # If to install tables for the modules in the EXTRA_MODULES variable.
-# INSTALL_EXTRA_TABLES=ask
+INSTALL_EXTRA_TABLES=no
 
 # If to install presence related tables.
-# INSTALL_PRESENCE_TABLES=ask
+INSTALL_PRESENCE_TABLES=no
 
 # Define what module tables should be installed.
 # If you use the postgres database and want to change the installed tables, then you
@@ -116,10 +117,10 @@
 
 ## control engine: FIFO or UNIXSOCK
 ## - default FIFO
-# CTLENGINE="FIFO"
+CTLENGINE="FIFO"
 
 ## path to FIFO file
-# OSER_FIFO="FIFO"
+OSER_FIFO="/tmp/kamailio_fifo"
 
 ## check ACL names; default on (1); off (0)
 # VERIFY_ACL=1
