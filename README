@@ -1,0 +1,64 @@
+This is a front-end SIP proxy configuration for the xlab1 project
+See for more details: https://txlab.wordpress.com/tag/xlab1/
+The configuration requires Kamailio version 3.3.x
+
+This work is licensed under a Creative Commons Attribution 3.0 License
+Author: Stanislav Sinyagin <ssinaygin@k-open.com>
+
+
+
+In this configuration, Kamailio serves as a pass-through proxy,
+dispatching everything to the back-end servers: all SIP messages
+including registration, and also RTP is proxied. This allows to keep
+only a minimal set of public IP addresses, and build as large
+infrastructure at the back-end as needed.
+
+The Dispatcher and Domain modules are used for SIP routing. They both
+use a text-based database for the lust of domains and routing
+destinations. A text database is chosen for two reasons: 1) no SQL
+dameon is required; 2) the database content can be managed by Git and
+replicated on multiple front-end servers.
+
+The domain table maps domain names to DID (domain ID):
+
+############### /opt/sipfe/etc/kamailio_db/domain ######
+id(int,auto) domain(string) did(string,null) last_modified(int)
+1:sip.customer01.com:1:0
+2:sip.customer02.com:2:0
+######
+
+
+The domain attributes table assigns a route set number that is used by
+Dispatcher:
+
+############### /opt/sipfe/etc/kamailio_db/domain_attrs ######
+id(int,auto) did(string) name(string) type(int) value(string) last_modified(int)
+1:1:routeset:0:1:0
+2:2:routeset:0:2:0
+######
+
+
+The dispatcher table matches each routeset into the internal server's IP
+address. The initial idea was to use DNS names, but Kamailio queries A
+records regardless if the initial SIP call was received over IPv4 or
+IPv6. So, explicit addresses have to be specified. For each routeset,
+4000+N is used for IPv4, and 6000+N for IPv6. The "attrs" field cannot
+be empty, so I added a dummy attribute which does not play any role.
+
+############### /opt/sipfe/etc/kamailio_db/dispatcher  ######
+id(int,auto) setid(int) destination(string) flags(int) priority(int) attrs(string) description(string)
+1:4001:sip\:10.100.0.17\:5060:0:1:backend=be011:"be011 default"
+2:4002:sip\:10.100.0.18\:5060:0:1:backend=be021:"be021 default"
+3:6001:sip\:[2001\:DB8\:8\:100\:\:17]\:5060:0:1:backend=be011:"be011 default"
+4:6001:sip\:[2001\:DB8\:8\:100\:\:18]\:5060:0:1:backend=be021:"be021 default"
+######
+
+
+The configuration is tested with Kamailio version 3.3.x. Also it
+requires the rtpproxy daemon to be running on the same or an additional
+server. Rtpproxy can also be scaled to utilize multiple cores, so the
+design is fully scalable. Two or more such servers can be running in
+parallel.
+
+After changing the database files, simply restart kamailio daemon. As
+it's completely stateless, no SIP running sessions would be harmed.
