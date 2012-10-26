@@ -14,7 +14,7 @@ only a minimal set of public IP addresses, and build as large
 infrastructure at the back-end as needed.
 
 The Dispatcher and Domain modules are used for SIP routing. They both
-use a text-based database for the lust of domains and routing
+use a text-based database for the list of domains and routing
 destinations. A text database is chosen for two reasons: 1) no SQL
 dameon is required; 2) the database content can be managed by Git and
 replicated on multiple front-end servers.
